@@ -177,3 +177,7 @@ C:\Users\halil\source\repos\IdentityVersion2\IdentityVersion2\obj\Debug\net8.0\r
 C:\Users\halil\source\repos\IdentityVersion2\IdentityVersion2\obj\Debug\net8.0\IdentityVersion2.pdb
 C:\Users\halil\source\repos\IdentityVersion2\IdentityVersion2\obj\Debug\net8.0\IdentityVersion2.genruntimeconfig.cache
 C:\Users\halil\source\repos\IdentityVersion2\IdentityVersion2\obj\Debug\net8.0\ref\IdentityVersion2.dll
+C:\Users\halil\source\repos\IdentityVersion2\IdentityVersion2\obj\Debug\net8.0\IdentityVersion2.sourcelink.json
+C:\Users\halil\source\repos\IdentityVersion2\IdentityVersion2\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Users\halil\source\repos\IdentityVersion2\IdentityVersion2\bin\Debug\net8.0\package-lock.json
+C:\Users\halil\source\repos\IdentityVersion2\IdentityVersion2\bin\Debug\net8.0\package.json

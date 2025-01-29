@@ -15,6 +15,9 @@ namespace IdentityVersion2.Controllers
 
         public IActionResult Index()
         {
+            Guid tryGuid = Guid.NewGuid();
+            TempData["guidThing"] = tryGuid;
+
             return View();
         }
 
@@ -27,6 +30,21 @@ namespace IdentityVersion2.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public IActionResult Create()
+        {
+            return View(new UserCreateModel());
+        }
+        [HttpPost]
+        public IActionResult Create(UserCreateModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                //business
+            }
+
+            return View(model);
         }
     }
 }

@@ -1,3 +1,8 @@
+using IdentityVersion2.Context;
+using IdentityVersion2.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
+
 namespace IdentityVersion2
 {
     public class Program
@@ -8,9 +13,21 @@ namespace IdentityVersion2
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddDbContext<UdemyContext>(opt =>
+            {
+                opt.UseSqlServer("server=localhost; database=IdentityDatabase; integrated security=true;TrustServerCertificate=true");
 
+            });
+            builder.Services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<UdemyContext>();//1
             var app = builder.Build();
 
+            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                RequestPath = "/node_modules",
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(),"node_modules")),
+
+            });
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
@@ -25,7 +42,7 @@ namespace IdentityVersion2
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
-
+           
             app.Run();
         }
     }
