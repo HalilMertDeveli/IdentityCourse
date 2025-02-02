@@ -25,6 +25,7 @@ namespace IdentityVersion2
                 opt.Password.RequireUppercase = false;
                 opt.Password.RequiredLength = 1;
                 opt.Password.RequireNonAlphanumeric = false;
+                opt.SignIn.RequireConfirmedEmail = true;
 
             }).AddEntityFrameworkStores<UdemyContext>();//1
             var app = builder.Build();
@@ -46,6 +47,7 @@ namespace IdentityVersion2
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseAuthentication();
 
             app.MapControllerRoute(
                 name: "default",
