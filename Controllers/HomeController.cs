@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using IdentityVersion2.Entities;
 using IdentityVersion2.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityVersion2.Controllers
@@ -7,10 +9,12 @@ namespace IdentityVersion2.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly UserManager<AppUser> _userManager;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager)
         {
             _logger = logger;
+            _userManager = userManager;
         }
 
         public IActionResult Index()
@@ -37,11 +41,28 @@ namespace IdentityVersion2.Controllers
             return View(new UserCreateModel());
         }
         [HttpPost]
-        public IActionResult Create(UserCreateModel model)
+        public async Task<IActionResult> Create(UserCreateModel model)
         {
             if (ModelState.IsValid)
             {
-                //business
+                AppUser appUser = new AppUser()
+                {
+                    Email = model.Email,
+                    Gender = model.Gender,
+                    UserName = model.UserName,
+                };
+                var identityResult= await _userManager.CreateAsync(appUser, password: model.Password);
+                if (identityResult.Succeeded)
+                {
+                    return RedirectToAction("Index");
+                }
+
+                foreach (var error in identityResult.Errors)
+                {
+                    ModelState.AddModelError("",error.Description);
+                }
+
+               
             }
 
             return View(model);

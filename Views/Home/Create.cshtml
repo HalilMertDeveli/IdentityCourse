@@ -35,14 +35,18 @@
         <label>Cinsiyet:</label>
         <span class="text-danger" asp-validation-for="@Model.Gender"></span>
 
-        <input type="email" asp-for="@Model.Gender" class="form-control" />
+        <input type="text" asp-for="@Model.Gender" class="form-control" />
+
+    </div>
+    <div class="text-danger" asp-validation-summary="ModelOnly">
 
     </div>
 
     <div>
 
-        <button type="submit" class="btn btn-primary">Kaydet</button>
+        <button type="submit" class="btn btn-primary mt-2">Kaydet</button>
     </div>
+
 
 
 </form>

@@ -18,7 +18,15 @@ namespace IdentityVersion2
                 opt.UseSqlServer("server=localhost; database=IdentityDatabase; integrated security=true;TrustServerCertificate=true");
 
             });
-            builder.Services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<UdemyContext>();//1
+            builder.Services.AddIdentity<AppUser, AppRole>(opt =>
+            {
+                opt.Password.RequireDigit = false;
+                opt.Password.RequireLowercase = false;
+                opt.Password.RequireUppercase = false;
+                opt.Password.RequiredLength = 1;
+                opt.Password.RequireNonAlphanumeric = false;
+
+            }).AddEntityFrameworkStores<UdemyContext>();//1
             var app = builder.Build();
 
             app.UseStaticFiles();
