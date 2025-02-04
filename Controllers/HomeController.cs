@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Security.Claims;
 using IdentityVersion2.Entities;
 using IdentityVersion2.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -8,24 +9,26 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityVersion2.Controllers
 {
+    [AutoValidateAntiforgeryToken] 
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _singInManager;
-
-        public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager, SignInManager<AppUser> singInManager)
+        private readonly RoleManager<AppRole> _roleManager;
+        public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager, SignInManager<AppUser> singInManager, RoleManager<AppRole> roleManager)
         {
             _logger = logger;
             _userManager = userManager;
             _singInManager = singInManager;
+            _roleManager = roleManager;
         }
 
         public IActionResult Index()
         {
             Guid tryGuid = Guid.NewGuid();
             TempData["guidThing"] = tryGuid;
-
+           
             return View();
         }
 
@@ -49,15 +52,26 @@ namespace IdentityVersion2.Controllers
         {
             if (ModelState.IsValid)
             {
-                AppUser appUser = new AppUser()
+                AppUser user = new AppUser()
                 {
                     Email = model.Email,
                     Gender = model.Gender,
                     UserName = model.UserName,
+                    ConcurrencyStamp = Guid.NewGuid().ToString(),
                 };
-                var identityResult= await _userManager.CreateAsync(appUser, password: model.Password);
+
+                var accurancyStamp = user.ConcurrencyStamp;
+                
+                var identityResult= await _userManager.CreateAsync(user, password: model.Password);
                 if (identityResult.Succeeded)
                 {
+                    //await _roleManager.CreateAsync(new()
+                    //{
+                    //    Name = "Admin",
+                    //    CreatedTime = DateTime.Now,
+                    //    ConcurrencyStamp = Guid.NewGuid().ToString()
+                    //});
+                    //await _userManager.AddToRoleAsync(user, "Admin");
                     return RedirectToAction("Index");
                 }
 
@@ -100,8 +114,10 @@ namespace IdentityVersion2.Controllers
         }
         [Authorize]
         public IActionResult GetUserInfo()
-        {
+         { 
             var userName = User.Identity.Name;
+            var role = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role);
+            var stringRole= User.IsInRole("Admin");
             return View();
         }
     }

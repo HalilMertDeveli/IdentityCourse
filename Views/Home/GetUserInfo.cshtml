@@ -1,3 +1,5 @@
-﻿<p>
-    User ınfo works
-</p>
+﻿@if (User.IsInRole("Admin"))
+{
+    <p>admin can see this </p>
+}
+<p>member see this</p>
