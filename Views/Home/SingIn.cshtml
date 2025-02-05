@@ -1,10 +1,11 @@
 ﻿@model UserSingInModel
 
 <form asp-action="SingIn" method="post" class="p-3 w-75 mx-auto shadow">
+    <input type="hidden" asp-for="ReturnUrl"/>
     <div class="mb-3">
         <label>Kullanıcı adı:</label>
         <span class="text-danger" asp-validation-for="@Model.UserName"></span>
-        <input asp-for="@Model.UserName" class="form-control" />
+        <input asp-for="@Model.UserName" class="form-control"/>
     </div>
 
     <div class="mb-3">
@@ -14,7 +15,7 @@
         <input type="password" asp-for="@Model.Password" class="form-control">
     </div>
 
-   
+
 
     <div>
 

@@ -1,4 +1,4 @@
-using IdentityVersion2.Context;
+﻿using IdentityVersion2.Context;
 using IdentityVersion2.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -28,6 +28,20 @@ namespace IdentityVersion2
                 opt.SignIn.RequireConfirmedEmail = false;
 
             }).AddEntityFrameworkStores<UdemyContext>();//1
+
+            builder.Services.ConfigureApplicationCookie(opt =>
+            {
+                opt.Cookie.HttpOnly = true;//java script ile alamasın 
+                opt.Cookie.SameSite = SameSiteMode.Strict;//sadece site kullanabilsin 
+                //opt.Cookie.SecurePolicy = CookieSecurePolicy.Always;//sadece https 'de çalışdı
+                opt.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;//hemp https hem de http 'de çalışsın
+                opt.Cookie.Name = "HMDCookie";
+                opt.ExpireTimeSpan=TimeSpan.FromDays(25);//25 gün sonra tarayıcıdan silinsin
+                opt.LoginPath = new PathString("/Home/SingIn");//Hata durumunda kullanıcının nereye gideceğini veriyoruz/Home/AdminPanel, 
+
+
+            });
+
             var app = builder.Build();
 
             app.UseStaticFiles();
@@ -49,7 +63,7 @@ namespace IdentityVersion2
             app.UseAuthorization();
             
 
-            app.MapControllerRoute(
+            app.MapControllerRoute(  
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
            

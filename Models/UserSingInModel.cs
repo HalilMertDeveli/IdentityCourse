@@ -8,5 +8,7 @@ namespace IdentityVersion2.Models
         public string UserName { get; set; }
         [Required(ErrorMessage = "Kullanıcı şifresi gereklidir")]
         public string Password { get; set; }
+
+        public string ReturnUrl { get; set; }
     }
 }

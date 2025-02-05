@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityVersion2.Controllers
 {
-    [AutoValidateAntiforgeryToken] 
+    [AutoValidateAntiforgeryToken]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -28,7 +28,7 @@ namespace IdentityVersion2.Controllers
         {
             Guid tryGuid = Guid.NewGuid();
             TempData["guidThing"] = tryGuid;
-           
+
             return View();
         }
 
@@ -61,63 +61,108 @@ namespace IdentityVersion2.Controllers
                 };
 
                 var accurancyStamp = user.ConcurrencyStamp;
-                
-                var identityResult= await _userManager.CreateAsync(user, password: model.Password);
+
+                var identityResult = await _userManager.CreateAsync(user, password: model.Password);
                 if (identityResult.Succeeded)
                 {
-                    //await _roleManager.CreateAsync(new()
-                    //{
-                    //    Name = "Admin",
-                    //    CreatedTime = DateTime.Now,
-                    //    ConcurrencyStamp = Guid.NewGuid().ToString()
-                    //});
-                    //await _userManager.AddToRoleAsync(user, "Admin");
+                    var memberRole = await _roleManager.FindByNameAsync("Member");
+                    if (memberRole == null)
+                    {
+                        await _roleManager.CreateAsync(new()
+                        {
+                            Name = "Member",
+                            CreatedTime = DateTime.Now,
+                            ConcurrencyStamp = Guid.NewGuid().ToString()
+                        });
+                    }
+                  
+                    await _userManager.AddToRoleAsync(user, "Member");
                     return RedirectToAction("Index");
                 }
 
                 foreach (var error in identityResult.Errors)
                 {
-                    ModelState.AddModelError("",error.Description);
+                    ModelState.AddModelError("", error.Description);
                 }
 
-               
+
             }
 
             return View(model);
         }
 
-        public IActionResult SingIn()
+        public IActionResult SingIn(string returnUrl)
         {
-            return View();
+            ViewBag.returnUrl = returnUrl;
+
+            return View(new UserSingInModel()
+            {
+                ReturnUrl = returnUrl
+            });
         }
         [HttpPost]
         public async Task<IActionResult> SingIn(UserSingInModel model)
         {
             if (ModelState.IsValid)
             {
-               var singInResult= await _singInManager.PasswordSignInAsync(model.UserName, model.Password, false, true);
-               if (singInResult.Succeeded)
-               {
-                   // bu iş başarılıdır
-               }
-               else if (singInResult.IsLockedOut)
-               {
-                   //Hesap kilitli
-               }
-               else if (singInResult.IsNotAllowed)
-               {
-                   //email && phone number doğrulanmış
-               }
+                var singInResult = await _singInManager.PasswordSignInAsync(model.UserName, model.Password, false, true);
+
+                if (string.IsNullOrWhiteSpace(model.ReturnUrl))
+                {
+                    Redirect(model.ReturnUrl);
+                }
+
+                if (singInResult.Succeeded)
+                {
+                    var user = await _userManager.FindByNameAsync(model.UserName);
+                    var roles = await _userManager.GetRolesAsync(user);
+                    if (roles.Contains("Member"))
+                    {
+                        return RedirectToAction("MemberPanel");
+                    }
+
+                    if (roles.Contains("Admin"))
+                    {
+                        return RedirectToAction("AdminPanel");
+                    }
+
+                    return RedirectToAction("MemberPanel");
+
+
+                }
+
+
+
+
+
+
             }
 
             return View(model);
         }
         [Authorize]
         public IActionResult GetUserInfo()
-         { 
+        {
             var userName = User.Identity.Name;
             var role = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role);
-            var stringRole= User.IsInRole("Admin");
+            var stringRole = User.IsInRole("Admin");
+            return View();
+        }
+
+        [Authorize(Roles = "Admin")]
+        public IActionResult AdminPanel()
+        {
+            return View();
+        }
+        [Authorize(Roles = "Member")]
+        public IActionResult MemberPanel()
+        {
+            return View();
+        }
+
+        [Authorize(Roles = "Member")]
+        public IActionResult MemberPage()
+        {
             return View();
         }
     }
